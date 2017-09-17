@@ -21,9 +21,7 @@ libraryDependencies ++= {
     "ch.qos.logback" % "logback-classic" % "1.2.3",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
 
-    "io.getquill" %% "quill-async-postgres" % "1.3.0",
-
-    "com.google.guava" % "guava" % "23.0"
+    "io.getquill" %% "quill-async-postgres" % "1.3.0"
   )
 
 }
