@@ -1,11 +1,11 @@
 package pl.mwt.mtrs.http.model
 
-import pl.mwt.mtrs.data.MovieId
+import pl.mwt.mtrs.data
 
 private[model]
 object Checks {
 
-  def checkImdbAndScreen(movieId: MovieId): Unit = {
+  def checkImdbAndScreen(movieId: data.MovieId): Unit = {
     notEmpty(movieId.imdbId, "imdbId")
     notEmpty(movieId.screenId, "screenId")
   }

@@ -1,8 +1,8 @@
 package pl.mwt.mtrs.http
 
 import akka.http.scaladsl.model.StatusCodes
-import pl.mwt.mtrs.http.model.MovieRef
-import pl.mwt.mtrs.svc.{Accepted, Rejected}
+import pl.mwt.mtrs.http.model.MovieId
+import pl.mwt.mtrs.svc.Reservation
 
 private[http]
 trait MovieTicketReservation
@@ -12,13 +12,16 @@ trait MovieTicketReservation
     super.movieRoute ~
     pathSuffix("ticket") {
       post {
-        entity(as[MovieRef]) { movieRef =>
+        entity(as[MovieId]) { movieRef =>
           onSuccess(movieService.reserveSeat(movieRef)) {
-            case Accepted =>
+            case Reservation.Accepted =>
               complete(StatusCodes.OK)
 
-            case Rejected(msg) =>
-              complete(StatusCodes.Forbidden, msg)
+            case Reservation.NoMovie =>
+              complete(StatusCodes.Forbidden, "No such movie")
+
+            case Reservation.NoSeats =>
+              complete(StatusCodes.Forbidden, "No more available seats")
           }
         }
       }

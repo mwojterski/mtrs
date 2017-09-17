@@ -7,7 +7,8 @@ trait MovieEndpoint
     extends Endpoint {
 
   override final def routes =
-    super.routes ~ pathPrefix("movie") {
+    super.routes ~
+    pathPrefix("movie") {
       movieRoute
     }
 
