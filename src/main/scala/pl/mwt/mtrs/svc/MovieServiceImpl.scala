@@ -6,7 +6,7 @@ import pl.mwt.mtrs.imdb.MovieTitleService
 import pl.mwt.mtrs.storage.MovieStore
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.implicitConversions
+import pl.mwt.mtrs.shared.FutureUtil.immediateSuccess
 
 class MovieServiceImpl(movieStore  : MovieStore,
                        titleService: MovieTitleService)
@@ -81,7 +81,4 @@ class MovieServiceImpl(movieStore  : MovieStore,
           reserveSeat(movie)
         }
       }
-
-  private implicit def immediateResult[A](a: A): Future[A] =
-    Future successful a
 }
