@@ -10,8 +10,8 @@ create table movie
     imdb_id          TEXT,
     screen_id        TEXT,
     movie_title      TEXT NOT NULL,
-    available_seats  INT,
-    reserved_seats   INT,
+    available_seats  INT NOT NULL,
+    reserved_seats   INT NOT NULL,
     PRIMARY KEY (imdb_id, screen_id),
     CHECK (reserved_seats <= available_seats)
 );
