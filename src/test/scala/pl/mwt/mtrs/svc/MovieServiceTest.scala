@@ -25,11 +25,11 @@ class MovieServiceTest
       Reservation:
         Reserve seat for registered movie         $reserveSeatForRegisteredMovie
         Reject reservation for unknown movie      $reserveSeatForUnknownMovie
-        Reject reservation if no more seats       $reserveSeatForFullAudienceMovie
+        Reject reservation if audience is full    $reserveSeatForFullAudienceMovie
 
       Information:
         Provide data for known movie              $infoForKnownMovie
-        Return no-movie for unknown movie         $infoForUnknownMovie
+        Inform of lacking data for unknown movie  $infoForUnknownMovie
 
   """
 
