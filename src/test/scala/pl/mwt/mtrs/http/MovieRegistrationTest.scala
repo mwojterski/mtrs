@@ -12,44 +12,58 @@ import pl.mwt.mtrs.svc.{MovieService, Registration}
 
 class MovieRegistrationTest
     extends Specification
-            with Specs2RouteTest
-            with Mockito {
+       with Specs2RouteTest
+       with Mockito {
 
 
   "Movie registration endpoint" should {
 
-    val movieDef = MovieDef(imdbId = "tt123",
-                           screenId = "scr_321",
-                           availableSeats = 25)
+    "Send created code with location header and message for success" in new TestCase {
 
-    "Accept and handle proper request" in new TestCase {
+      registerMovie returns Registration.Accepted
 
-      movieService register movieDef returns Registration.Accepted
+      request ~> routes ~> check {
+        status shouldEqual StatusCodes.Created
+        header[Location] should beSome // todo: check generated uri?
 
-      Post("/movie", movieDef) ~> routes ~> check {
-        status ==== StatusCodes.Created
-        header[Location] must beSome // todo: check generated uri?
-
-        responseAs[String] ==== "Movie registered"
+        responseAs[String] shouldEqual "Movie registered"
       }
     }
 
-    "Reject duplicated movie" in new TestCase {
+    "Send forbidden code and message for duplicated movie" in new TestCase {
 
-      movieService register any() returns Registration.Exists
+      registerMovie returns Registration.Exists
 
-      Post("/movie", movieDef) ~> routes ~> check {
-        status ==== StatusCodes.Forbidden
+      request ~> routes ~> check {
+        status shouldEqual StatusCodes.Forbidden
 
-        responseAs[String] ==== "Movie already exists"
+        responseAs[String] shouldEqual "Movie already exists"
       }
     }
+
+    "Send bad-request code and message for unrecognized imdb-id" in new TestCase {
+
+      registerMovie returns Registration.InvalidImdbId
+
+      request ~> routes ~> check {
+        status shouldEqual StatusCodes.BadRequest
+
+        responseAs[String] shouldEqual "Invalid imdbId"
+      }
+    }
+
   }
 
   trait TestCase extends Scope
     with MovieRegistration {
 
     val movieService = mock[MovieService]
+
+    val request = Post("/movie", MovieDef(imdbId = "tt123",
+                                          screenId = "scr_321",
+                                          availableSeats = 25))
+
+    def registerMovie = movieService register any()
   }
 
 }

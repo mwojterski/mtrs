@@ -5,7 +5,7 @@ import akka.http.scaladsl.testkit.Specs2RouteTest
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
-import pl.mwt.mtrs.http.model.{MovieId, MovieInfo}
+import pl.mwt.mtrs.http.model.MovieInfo
 import pl.mwt.mtrs.shared.FutureUtil.immediateSuccess
 import pl.mwt.mtrs.svc.{HasInfo, MovieService, NoMovie}
 
@@ -16,12 +16,7 @@ class MovieInformationTest
 
   "Movie information endpoint" should {
 
-    val request = Get("/movie?imdbId=tt0111161&screenId=screen_123456")
-
-    "Provide correct information for known movie" in new TestCase {
-
-      val movieId = MovieId(imdbId = "tt0111161",
-                            screenId = "screen_123456")
+    "Send ok code and proper payload for known movie" in new TestCase {
 
       val movieInfo = MovieInfo(imdbId = "tt0111161",
                                 screenId = "screen_123456",
@@ -29,33 +24,38 @@ class MovieInformationTest
                                 availableSeats = 100,
                                 reservedSeats = 50)
 
-      movieService getInformation movieId returns HasInfo(movieInfo)
+      movieInformation returns HasInfo(movieInfo)
 
       request ~> routes ~> check {
-        status ==== StatusCodes.OK
-        contentType ==== ContentTypes.`application/json`
+        status shouldEqual StatusCodes.OK
 
-        responseAs[String] ====
+        contentType shouldEqual ContentTypes.`application/json`
+        responseAs[String] shouldEqual
           """{"reservedSeats":50,"screenId":"screen_123456","imdbId":"tt0111161"""" +
           ""","availableSeats":100,"movieTitle":"The Shawshank Redemption"}"""
       }
     }
 
-    "Respond with error message for unknown movie" in new TestCase {
+    "Send client error code and message for unknown movie" in new TestCase {
 
-      movieService getInformation any() returns NoMovie
+      movieInformation returns NoMovie
 
       request ~> routes ~> check {
-        status ==== StatusCodes.NotFound
+        status shouldEqual StatusCodes.NotFound
 
-        responseAs[String] ==== "No such movie"
+        responseAs[String] shouldEqual "No such movie"
       }
     }
+
   }
 
   trait TestCase extends Scope
     with MovieInformation {
 
     val movieService = mock[MovieService]
+
+    val request = Get("/movie?imdbId=tt0111161&screenId=screen_123456")
+
+    def movieInformation = movieService getInformation any()
   }
 }
